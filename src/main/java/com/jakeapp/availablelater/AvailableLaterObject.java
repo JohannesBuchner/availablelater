@@ -7,9 +7,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * provides a method of providing the result later. The
- * {@link AvailableLaterObject} is returned immediately. <p/> The supplied
- * listener tells you when the result is done or had an error. <p/> In
- * {@link #run()}, implement the method that takes time. call
+ * {@link AvailableLaterObject} is returned immediately.
+ * <p/>
+ * The supplied listener tells you when the result is done or had an error.
+ * <p/>
+ * In {@link #run()}, implement the method that takes time. call
  * {@link #set(Object)}() when your done or the methods of
  * {@link AvailabilityListener} to notify the progress.
  * 
@@ -24,10 +26,16 @@ public abstract class AvailableLaterObject<T> implements Runnable {
 	protected AvailabilityListener<T> listener;
 
 	protected Semaphore s = new Semaphore(0);
-	
+
 	private AtomicBoolean alreadyStarted = new AtomicBoolean(false);
 
-	private StackTraceElement[] callerStackTrace = new Throwable().getStackTrace();
+	/*
+	 * for debugging purposes it is useful to know where this object was
+	 * created.
+	 */
+	@SuppressWarnings("unused")
+	private StackTraceElement[] callerStackTrace = new Throwable()
+			.getStackTrace();
 
 	/* server functions */
 	protected void set(T o) {
@@ -38,14 +46,14 @@ public abstract class AvailableLaterObject<T> implements Runnable {
 	public AvailableLaterObject() {
 		log.debug("Created AvailableLaterObject");
 	}
-/*
-	@Deprecated
-	public AvailableLaterObject(AvailabilityListener listener) {
-		setListener(listener);
-	}*/
+
+	/*
+	 * @Deprecated public AvailableLaterObject(AvailabilityListener listener) {
+	 * setListener(listener); }
+	 */
 
 	public abstract T calculate() throws Exception;
-	
+
 	public void run() {
 		log.debug("Running " + this.getClass().getSimpleName());
 		try {
@@ -55,17 +63,19 @@ public abstract class AvailableLaterObject<T> implements Runnable {
 			getListener().error(e);
 		}
 	}
-	
+
 	/**
 	 * client function: get the result when done.
+	 * 
 	 * @return
 	 */
 	public T get() {
 		return getInnercontent();
 	}
-	
+
 	/**
 	 * client function: What should be called when done?
+	 * 
 	 * @param listener
 	 */
 	public void setListener(AvailabilityListener<T> listener) {
@@ -85,9 +95,10 @@ public abstract class AvailableLaterObject<T> implements Runnable {
 			}
 		}
 	}
-	
+
 	/**
 	 * server function: access to the listener
+	 * 
 	 * @return
 	 */
 	protected AvailabilityListener<T> getListener() {
@@ -105,9 +116,9 @@ public abstract class AvailableLaterObject<T> implements Runnable {
 
 		if (!this.setAlreadyStarted()) {
 			new Thread(this).start();
-			//this.run();
+			// this.run();
 		}
-			
+
 		return this;
 	}
 
