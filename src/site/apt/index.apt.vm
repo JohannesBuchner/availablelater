@@ -1,0 +1,20 @@
+	--------------------------
+	About the AvailableLaterObject library
+
+About the AvailableLaterObject library
+
+  ${project.description}
+
+  In a normal blocking call, you can either 
+    [[a]] wait for the result or <br/>
+    [[b]] spawn a thread, do the call, and get notified when the thread finishes.
+
+  AvailableLaterObjects turn this around by making (b) the default. The result of a call is a AvailableLaterObject, which you can listen to (get notified) for a result.
+
+  Making this the default behaviour simplifies writing threaded applications, such as GUIs.
+
+  If you want to have the blocking behaviour, you simply create an AvailableLaterWaiter, which blocks until the result of the operation is available.
+
+  Contrary to Futures, AvailableLaterObjects leave it to the callee to spawn and run the thread, or to decide if a result is instantaneously available (no thread spawn necessary, AvailableNowObject).
+
+  Finally, AvailableLaterObjects also allow the task to provides simple notifications on its progress.
