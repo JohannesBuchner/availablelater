@@ -1,6 +1,5 @@
 package com.jakeapp.availablelater;
 
-import org.apache.log4j.Logger;
 
 /**
  * A {@link AvailableLaterObject} where the calculation is not asynchronous. To
@@ -11,47 +10,17 @@ import org.apache.log4j.Logger;
  * @param <T>
  *            result type.
  */
-public class AvailableNowObject<T> extends AvailableLaterObject<T> {
-	private static final Logger log = Logger
-		.getLogger(AvailableNowObject.class);
+public class AvailableNowObject<T> implements AvailableLater<T> {
 
-	/* server functions */
-	@Override
-	protected void set(T o) {
-		this.setInnercontent(o);
-	}
+	private T value;
 
-	@Override
-	public void run() {
-		// we don't need to do anything.
-	}
-
-	/**
-	 * 
-	 * @param content
-	 *            value to return.
-	 */
-	public AvailableNowObject(T content) {
-		if (log.isDebugEnabled())
-			log.debug("Creating AvailableNowObject with " + content);
-		this.set(content);
-	}
-
-	@Override
-	public T calculate() throws Exception {
-		return null;
+	public AvailableNowObject(T value) {
+		this.value = value;
 	}
 
 	@Override
 	public void setListener(AvailabilityListener<T> listener) {
-		listener.finished(this.get());
-		super.setListener(listener);
+		listener.finished(this.value);
 	}
 
-	@Override
-	public AvailableLater<T> start() {
-		if (log.isDebugEnabled())
-			log.debug("AvailableNowObject - returning myself now");
-		return this;
-	}
 }

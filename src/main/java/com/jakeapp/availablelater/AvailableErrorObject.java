@@ -8,7 +8,7 @@ package com.jakeapp.availablelater;
  * 
  * @author christopher
  */
-public class AvailableErrorObject<T> extends AvailableNowObject<T> {
+public class AvailableErrorObject<T> implements AvailableLater<T> {
 
 	private Exception exception;
 
@@ -16,23 +16,13 @@ public class AvailableErrorObject<T> extends AvailableNowObject<T> {
 	 * @param ex
 	 *            The error to report.
 	 */
-	public AvailableErrorObject(Exception ex) {
-		super(null);
-		this.setException(ex);
+	public AvailableErrorObject(Exception exception) {
+		this.exception = exception;
 	}
 
 	@Override
 	public void setListener(AvailabilityListener<T> listener) {
 		listener.error(this.exception);
-	}
-
-	@Override
-	public T calculate() throws Exception {
-		throw this.exception;
-	}
-
-	private void setException(Exception exception) {
-		this.exception = exception;
 	}
 
 }

@@ -24,16 +24,14 @@ public interface AvailabilityListener<T> {
 	public void statusUpdate(StatusUpdate progress);
 
 	/**
-	 * The operation is finished, and this is the result. All calls to
-	 * {@link AvailableLaterObject#get()} will return this result too, now.
+	 * The operation is finished, and this is the result.
 	 * 
 	 * @param o
 	 */
 	public void finished(T o);
 
 	/**
-	 * The operation failed by throwing this exception. All calls to
-	 * {@link AvailableLaterObject#get()} will throw this exception now.
+	 * The operation failed by throwing this exception.
 	 * 
 	 * @param o
 	 */

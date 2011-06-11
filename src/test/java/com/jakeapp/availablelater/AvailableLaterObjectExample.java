@@ -11,7 +11,7 @@ public class AvailableLaterObjectExample {
 	 * First, we show the "normal" blocking behaviour. This does not spawn a new
 	 * Thread anywhere.
 	 */
-	public static AvailableLaterObject<String> calcQuickly(final int param1) {
+	public static AvailableLater<String> calcQuickly(final int param1) {
 		if (param1 == 0)
 			// we throw an error.
 			return new AvailableErrorObject<String>(new Exception("foo"));
@@ -58,7 +58,7 @@ public class AvailableLaterObjectExample {
 					throw new Exception("foo");
 
 				// we can provide simple progress information
-				getListener().statusUpdate(new StatusUpdate(0.5, "bla"));
+				setStatus(new StatusUpdate(0.5, "bla"));
 				Thread.sleep(1000);
 
 				// we can just call return when we have finished the

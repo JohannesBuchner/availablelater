@@ -8,6 +8,8 @@ import local.test.Tracer;
 
 import org.junit.Test;
 
+import sun.java2d.pipe.NullPipe;
+
 public class AvailableLaterObjectTest {
 
 	public static class AvailablesProvider {
@@ -26,10 +28,23 @@ public class AvailableLaterObjectTest {
 				}
 			}.start();
 		}
+		public static AvailableLater<Boolean> provideLaterDoubleStart() {
+			AvailableLaterObject<Boolean> avl = new AvailableLaterObject<Boolean>() {
+
+				@Override
+				public Boolean calculate() throws Exception {
+					Thread.sleep(1);
+					return true;
+				}
+			};
+			avl.start();
+			avl.start();
+			return avl;
+		}
+
 
 		public static AvailableLater<Boolean> provideError() {
-			return new AvailableErrorObject<Boolean>(new Exception("myerror"))
-				.start();
+			return new AvailableErrorObject<Boolean>(new Exception("myerror"));
 		}
 
 		public static AvailableLater<Boolean> provideLaterError() {
@@ -54,7 +69,28 @@ public class AvailableLaterObjectTest {
 
 					@Override
 					public String calculate() throws Exception {
-						return "foo" + this.getSource().get();
+						return "foo" + this.getSourceResult();
+					}
+				};
+			avl.start();
+			return avl;
+		}
+
+		public static AvailableLater<String> provideLaterWrapException() {
+
+			AvailableLater<String> parent =
+				new AvailableErrorObject<String>(new NullPointerException());
+			AvailableLaterObject<String> avl =
+				new AvailableLaterWrapperObject<String, String>(parent) {
+
+					@Override
+					public String calculate() throws Exception {
+						try {
+							this.getSourceResult();
+						} catch (NullPointerException e) {
+							return "nullish";
+						}
+						return "bar";
 					}
 				};
 			avl.start();
@@ -81,7 +117,7 @@ public class AvailableLaterObjectTest {
 
 						@Override
 						public String calculate() throws Exception {
-							return getSource().get() + " " + word;
+							return this.getSourceResult() + " " + word;
 						}
 					};
 				lastavl = avl1;
@@ -106,9 +142,8 @@ public class AvailableLaterObjectTest {
 							v[i] = v[i - 1].add(v[i - 2]);
 							i++;
 						}
-						this.getListener().statusUpdate(
-							new StatusUpdate(j * 1.0 / nsteps, "looks good: "
-								+ v[i - 1]));
+						this.setStatus(new StatusUpdate(j * 1.0 / nsteps,
+							"looks good: " + v[i - 1]));
 					}
 					while (i < max) {
 						Thread.sleep(1);
@@ -134,6 +169,17 @@ public class AvailableLaterObjectTest {
 
 	@Test
 	public void testAvailableLater() {
+		final Tracer tracer = new Tracer();
+
+		AvailableLater<Boolean> avl = AvailablesProvider.provideLater();
+		avl.setListener(new TracingListener<Boolean>(tracer));
+		Assert.assertTrue(tracer
+			.await("done: true", 100, TimeUnit.MILLISECONDS));
+		Assert.assertTrue(tracer.isDone());
+	}
+
+	@Test
+	public void testAvailableLaterDoubleStart() {
 		final Tracer tracer = new Tracer();
 
 		AvailableLater<Boolean> avl = AvailablesProvider.provideLater();
@@ -206,6 +252,16 @@ public class AvailableLaterObjectTest {
 		AvailableLater<String> avl = AvailablesProvider.provideLaterWrap();
 		avl.setListener(new TracingListener<String>(tracer));
 		Assert.assertTrue(tracer.await("done: foobar", 100,
+			TimeUnit.MILLISECONDS));
+		Assert.assertTrue(tracer.isDone());
+	}
+
+	@Test
+	public void testWrapException() {
+		final Tracer tracer = new Tracer();
+		AvailableLater<String> avl = AvailablesProvider.provideLaterWrapException();
+		avl.setListener(new TracingListener<String>(tracer));
+		Assert.assertTrue(tracer.await("done: nullish", 100,
 			TimeUnit.MILLISECONDS));
 		Assert.assertTrue(tracer.isDone());
 	}

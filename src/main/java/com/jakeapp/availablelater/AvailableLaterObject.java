@@ -6,40 +6,37 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * {@link AvailableLaterObject}s provide a method of providing the result of a
- * calculation later. The {@link AvailableLaterObject} is returned immediately,
- * while the calculation runs asynchronously.
+ * {@link AvailableLaterObject}s is an implementation of
+ * {@link AvailabilityListener} that is similar to {@link Runnable}, except it
+ * can deal with Exceptions.
  * 
- * The supplied listener, a {@link AvailabilityListener} tells you when the
- * result is done or had an error.
+ * Implementers of this class should override {@link #calculate()} with the
+ * asynchronous calculation (like {@link Runnable#run()}.
  * 
- * Callee:
+ * You may call {@link #setStatus(StatusUpdate)} to notify the listener of the
+ * current progress.
  * 
- * In {@link #run()}, implement the method that takes time. call
- * {@link #set(Object)}() when your done or the methods of
- * {@link AvailabilityListener} to notify the progress.
- * 
- * Call start() and return the object.
- * 
- * Caller:
- * 
- * set up a listener using {@link #setListener(AvailabilityListener)}.
+ * Make sure you call {@link #start()} after you create a
+ * {@link AvailableLaterObject} and before you return it to the caller.
+ * Otherwise, the {@link #calculate()} method will never be called.
  * 
  * @author johannes
  * @param <T>
  *            result type
- * @see AvailableLaterWaiter
  */
 public abstract class AvailableLaterObject<T> implements Runnable,
 	AvailableLater<T> {
 	private static Logger log = Logger.getLogger(AvailableLaterObject.class);
-	protected T innercontent;
 
 	private AvailabilityListener<T> listener;
 
 	protected Semaphore s = new Semaphore(0);
 
 	private AtomicBoolean alreadyStarted = new AtomicBoolean(false);
+
+	protected void setStatus(StatusUpdate update) {
+		this.getListener().statusUpdate(update);
+	}
 
 	/*
 	 * for debugging purposes it is useful to know where this object was
@@ -51,7 +48,6 @@ public abstract class AvailableLaterObject<T> implements Runnable,
 
 	/* server functions */
 	protected void set(T o) {
-		this.setInnercontent(o);
 		getListener().finished(o);
 	}
 
@@ -73,11 +69,6 @@ public abstract class AvailableLaterObject<T> implements Runnable,
 		}
 	}
 
-	@Override
-	public T get() {
-		return getInnercontent();
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -86,9 +77,6 @@ public abstract class AvailableLaterObject<T> implements Runnable,
 	 */
 	@Override
 	public void setListener(AvailabilityListener<T> listener) {
-		if (!isAlreadyStarted() && log.isInfoEnabled()) {
-			log.info("The callee possibly forgot to call start()");
-		}
 		this.listener = listener;
 		this.s.release();
 	}
@@ -111,7 +99,7 @@ public abstract class AvailableLaterObject<T> implements Runnable,
 	 * 
 	 * @return
 	 */
-	protected AvailabilityListener<T> getListener() {
+	private AvailabilityListener<T> getListener() {
 		blockForListener();
 		return this.listener;
 	}
@@ -126,7 +114,6 @@ public abstract class AvailableLaterObject<T> implements Runnable,
 	public AvailableLater<T> start() {
 		if (!this.setAlreadyStarted()) {
 			new Thread(this).start();
-			// this.run();
 		}
 
 		return this;
@@ -140,11 +127,4 @@ public abstract class AvailableLaterObject<T> implements Runnable,
 		return this.alreadyStarted.get();
 	}
 
-	protected T getInnercontent() {
-		return this.innercontent;
-	}
-
-	protected void setInnercontent(T innercontent) {
-		this.innercontent = innercontent;
-	}
 }

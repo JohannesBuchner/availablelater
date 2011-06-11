@@ -9,7 +9,7 @@ public class AvailableLaterWaiterTest {
 	public static class AvailablesProvider {
 
 		public static AvailableLater<Boolean> provideNow() {
-			return new AvailableNowObject<Boolean>(true).start();
+			return new AvailableNowObject<Boolean>(true);
 		}
 
 		public static AvailableLater<Boolean> provideLater() {
@@ -24,8 +24,7 @@ public class AvailableLaterWaiterTest {
 		}
 
 		public static AvailableLater<Boolean> provideError() {
-			return new AvailableErrorObject<Boolean>(new Exception("myerror"))
-				.start();
+			return new AvailableErrorObject<Boolean>(new Exception("myerror"));
 		}
 	}
 

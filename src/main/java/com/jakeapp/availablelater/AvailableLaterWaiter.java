@@ -28,10 +28,9 @@ public class AvailableLaterWaiter<T> implements AvailabilityListener<T> {
 
 	private Semaphore s = new Semaphore(0);
 	private Exception exception = null;
-	private AvailableLater<T> avl;
+	private T value;
 
 	protected AvailableLaterWaiter(AvailableLater<T> avl) {
-		this.avl = avl;
 		avl.setListener(this);
 		while (true) {
 			try {
@@ -51,6 +50,7 @@ public class AvailableLaterWaiter<T> implements AvailabilityListener<T> {
 
 	@Override
 	public void finished(T o) {
+		AvailableLaterWaiter.this.value = o;
 		AvailableLaterWaiter.this.s.release();
 	}
 
@@ -67,6 +67,6 @@ public class AvailableLaterWaiter<T> implements AvailabilityListener<T> {
 	protected T get() throws Exception {
 		if (this.exception != null)
 			throw this.exception;
-		return this.avl.get();
+		return this.value;
 	}
 }

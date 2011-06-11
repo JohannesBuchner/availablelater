@@ -17,6 +17,22 @@ public abstract class AvailableLaterWrapperObject<T, S> extends
 	AvailableLaterObject<T> implements AvailabilityListener<S> {
 
 	private AvailableLater<S> source;
+	private S sourceResult;
+	private Exception sourceException;
+
+	/**
+	 * fetch the result of the source calculation
+	 * 
+	 * @return
+	 * @throws Exception
+	 *             if the source throw an exception
+	 */
+	protected S getSourceResult() throws Exception {
+		if (this.sourceException != null)
+			throw this.sourceException;
+		return this.sourceResult;
+
+	}
 
 	/**
 	 * @param source
@@ -37,18 +53,13 @@ public abstract class AvailableLaterWrapperObject<T, S> extends
 	}
 
 	/**
-	 * Implementer function to fetch the result of the source calculation.
-	 */
-	protected AvailableLater<S> getSource() {
-		return this.source;
-	}
-
-	/**
 	 * do not call this.
 	 */
 	@Override
 	public void error(Exception t) {
-		getListener().error(t);
+		this.sourceException = t;
+		// now we can start
+		new Thread(this).start();
 	}
 
 	/**
@@ -56,31 +67,19 @@ public abstract class AvailableLaterWrapperObject<T, S> extends
 	 */
 	@Override
 	public void finished(S o) {
-		/*
-		 * The run method of the source has returned by reporting finished. We
-		 * can not perform our calculation based on the intermediate results the
-		 * source provided.
-		 */
-
-		// perform this class' calculation
+		this.sourceResult = o;
+		// now we can start
 		new Thread(this).start();
-		// report finished to the listener that is listening to
-		// this AvailableLaterObject.
-
-		/*
-		 * Do not call this - the run method should set a value and report
-		 * 'finished'.
-		 */
-		// this.listener.finished();
 	}
 
 	@Override
 	public void statusUpdate(StatusUpdate p) {
-		this.getListener().statusUpdate(p);
+		setStatus(p);
 	}
 
 	@Override
 	public AvailableLater<T> start() {
+		// we can't start, we have to wait for the source
 		return this;
 	}
 }
