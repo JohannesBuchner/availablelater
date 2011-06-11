@@ -30,11 +30,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *            result type
  * @see AvailableLaterWaiter
  */
-public abstract class AvailableLaterObject<T> implements Runnable {
+public abstract class AvailableLaterObject<T> implements Runnable,
+	AvailableLater<T> {
 	private static Logger log = Logger.getLogger(AvailableLaterObject.class);
 	protected T innercontent;
 
-	protected AvailabilityListener<T> listener;
+	private AvailabilityListener<T> listener;
 
 	protected Semaphore s = new Semaphore(0);
 
@@ -72,34 +73,33 @@ public abstract class AvailableLaterObject<T> implements Runnable {
 		}
 	}
 
-	/**
-	 * Caller function: get the result when done. If the calculation is not
-	 * done, the result is undefined. It might return null or a preliminary
-	 * result if the calculation sets it.
-	 * 
-	 * @return
-	 */
+	@Override
 	public T get() {
 		return getInnercontent();
 	}
 
-	/**
-	 * Caller function: What should be called when done?
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param listener
+	 * @see com.jakeapp.availablelater.AvailableLater#setListener(com.jakeapp.
+	 * availablelater.AvailabilityListener)
 	 */
+	@Override
 	public void setListener(AvailabilityListener<T> listener) {
+		if (!isAlreadyStarted() && log.isInfoEnabled()) {
+			log.info("The callee possibly forgot to call start()");
+		}
 		this.listener = listener;
-		s.release();
+		this.s.release();
 	}
 
 	/**
 	 * waits until a listener is set
 	 */
 	private void blockForListener() {
-		if (listener == null) {
+		if (this.listener == null) {
 			try {
-				s.acquire();
+				this.s.acquire();
 			} catch (InterruptedException e) {
 				blockForListener();
 			}
@@ -113,7 +113,7 @@ public abstract class AvailableLaterObject<T> implements Runnable {
 	 */
 	protected AvailabilityListener<T> getListener() {
 		blockForListener();
-		return listener;
+		return this.listener;
 	}
 
 	/**
@@ -123,7 +123,7 @@ public abstract class AvailableLaterObject<T> implements Runnable {
 	 * 
 	 * @return the object itself
 	 */
-	public AvailableLaterObject<T> start() {
+	public AvailableLater<T> start() {
 		if (!this.setAlreadyStarted()) {
 			new Thread(this).start();
 			// this.run();
@@ -141,7 +141,7 @@ public abstract class AvailableLaterObject<T> implements Runnable {
 	}
 
 	protected T getInnercontent() {
-		return innercontent;
+		return this.innercontent;
 	}
 
 	protected void setInnercontent(T innercontent) {

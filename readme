@@ -1,22 +1,14 @@
-=========================
-About AvailableLater
-=========================
 
-This library allows asynchronous method invocation, i.e. the result may not be available
-immediatly.
+To get information about the AvailableLaterObject library, either
 
-The calling function receives a AvailableLaterObject, and can await the result.
-The callee can decide whether to spawn a Thread or whether a error occured (Exceptions
-are passed on transparently) or whether the result is available immediatly.
+ * build the site using mvn site
 
+or 
 
-Why not use Future or FutureTask?
-----------------------------------
-They do something differently. Futures are meant to give the receiver of the Future
-to control the execution.
+  see src/site/apt/index.apt.vm
 
-AvailableLater on the other hand, allows the callee to spawn a thread and give back
-a result. The spawning of the thread is transparent and the interface is the same 
-when no thread is necessary.
+or 
 
+  look at src/test/java/com/jakeapp/availablelater/AvailableLaterObjectExample.java
+  for well-documented example usage.
 

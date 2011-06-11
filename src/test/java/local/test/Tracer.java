@@ -2,9 +2,7 @@ package local.test;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -19,7 +17,7 @@ public class Tracer {
 
 	public void step(String step) {
 		log.debug("'" + step + "' reached.");
-		synchronized (trace) {
+		synchronized (this.trace) {
 			this.trace.add(step);
 		}
 		this.s.release();
@@ -102,7 +100,7 @@ public class Tracer {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder("Trace[");
-		synchronized (trace) {
+		synchronized (this.trace) {
 			for (String step : getTrace()) {
 				sb.append(step);
 				sb.append(",");

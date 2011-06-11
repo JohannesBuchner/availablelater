@@ -4,20 +4,20 @@
 package com.jakeapp.availablelater;
 
 public class StatusUpdate {
-	public StatusUpdate(double progress, String status) {
+	public StatusUpdate(double p, String s) {
 		super();
-		this.progress = progress;
-		this.status = status;
+		this.progress = p;
+		this.status = s;
 	}
 
 	private double progress;
 	private String status;
 
 	public double getProgress() {
-		return progress;
+		return this.progress;
 	}
 
 	public String getStatus() {
-		return status;
+		return this.status;
 	}
 }

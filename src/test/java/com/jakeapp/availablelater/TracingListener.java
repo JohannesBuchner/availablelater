@@ -3,6 +3,8 @@
  */
 package com.jakeapp.availablelater;
 
+import org.apache.log4j.Logger;
+
 import local.test.Tracer;
 
 class TracingListener<V> implements AvailabilityListener<V> {
@@ -16,12 +18,12 @@ class TracingListener<V> implements AvailabilityListener<V> {
 
 	@Override
 	public void error(Exception t) {
-		tracer.step("error: " + t.getMessage());
+		this.tracer.step("error: " + t.getMessage());
 	}
 
 	@Override
 	public void finished(V o) {
-		tracer.step("done: " + o.toString());
+		this.tracer.step("done: " + o.toString());
 	}
 
 	@Override

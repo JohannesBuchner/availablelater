@@ -35,7 +35,4 @@ public class AvailableErrorObject<T> extends AvailableNowObject<T> {
 		this.exception = exception;
 	}
 
-	private Exception getException() {
-		return exception;
-	}
 }

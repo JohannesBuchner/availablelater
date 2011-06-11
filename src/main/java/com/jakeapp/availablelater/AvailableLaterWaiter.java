@@ -10,7 +10,7 @@ import java.util.concurrent.Semaphore;
  * 
  * @param <T>
  */
-public class AvailableLaterWaiter<T> {
+public class AvailableLaterWaiter<T> implements AvailabilityListener<T> {
 
 	/**
 	 * Waits for the result and returns it (or throws the received exception).
@@ -22,45 +22,41 @@ public class AvailableLaterWaiter<T> {
 	 * @return
 	 * @throws Exception
 	 */
-	public static <TT> TT await(AvailableLaterObject<TT> avl) throws Exception {
+	public static <TT> TT await(AvailableLater<TT> avl) throws Exception {
 		return new AvailableLaterWaiter<TT>(avl).get();
 	}
 
 	private Semaphore s = new Semaphore(0);
 	private Exception exception = null;
-	private T result = null;
-	private AvailableLaterObject<T> avl;
+	private AvailableLater<T> avl;
 
-	protected AvailableLaterWaiter(AvailableLaterObject<T> avl) {
+	protected AvailableLaterWaiter(AvailableLater<T> avl) {
 		this.avl = avl;
-		avl.start();
-
-		avl.setListener(new AvailabilityListener<T>() {
-
-			@Override
-			public void error(Exception t) {
-				AvailableLaterWaiter.this.exception = t;
-				s.release();
-			}
-
-			@Override
-			public void finished(T o) {
-				AvailableLaterWaiter.this.result = o;
-				s.release();
-			}
-
-			@Override
-			public void statusUpdate(StatusUpdate p) {
-			}
-
-		});
+		avl.setListener(this);
 		while (true) {
 			try {
-				s.acquire();
+				this.s.acquire();
 				break;
 			} catch (InterruptedException e) {
+				// that's why we have the while
 			}
 		}
+	}
+
+	@Override
+	public void error(Exception t) {
+		AvailableLaterWaiter.this.exception = t;
+		AvailableLaterWaiter.this.s.release();
+	}
+
+	@Override
+	public void finished(T o) {
+		AvailableLaterWaiter.this.s.release();
+	}
+
+	@Override
+	public void statusUpdate(StatusUpdate p) {
+		// no status update necessary, we only wait for the result
 	}
 
 	/**
@@ -71,6 +67,6 @@ public class AvailableLaterWaiter<T> {
 	protected T get() throws Exception {
 		if (this.exception != null)
 			throw this.exception;
-		return avl.get();
+		return this.avl.get();
 	}
 }

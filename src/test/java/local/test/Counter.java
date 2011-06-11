@@ -47,6 +47,7 @@ public class Counter {
 					return false;
 				}
 			} catch (InterruptedException e) {
+				// that's why we have the while ...
 			}
 		}
 	}

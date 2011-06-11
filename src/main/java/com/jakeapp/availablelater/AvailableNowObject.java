@@ -23,11 +23,7 @@ public class AvailableNowObject<T> extends AvailableLaterObject<T> {
 
 	@Override
 	public void run() {
-	}
-
-	@Override
-	protected AvailabilityListener<T> getListener() {
-		return listener;
+		// we don't need to do anything.
 	}
 
 	/**
@@ -36,24 +32,26 @@ public class AvailableNowObject<T> extends AvailableLaterObject<T> {
 	 *            value to return.
 	 */
 	public AvailableNowObject(T content) {
-		log.debug("Creating AvailableNowObject with " + content);
+		if (log.isDebugEnabled())
+			log.debug("Creating AvailableNowObject with " + content);
 		this.set(content);
 	}
 
 	@Override
 	public T calculate() throws Exception {
-		log.debug("Calculating AvailableNowObject - direct data return");
-		return this.get();
+		return null;
 	}
 
 	@Override
 	public void setListener(AvailabilityListener<T> listener) {
 		listener.finished(this.get());
+		super.setListener(listener);
 	}
 
 	@Override
-	public AvailableLaterObject<T> start() {
-		log.debug("AvailableNowObject - returning myself now");
+	public AvailableLater<T> start() {
+		if (log.isDebugEnabled())
+			log.debug("AvailableNowObject - returning myself now");
 		return this;
 	}
 }

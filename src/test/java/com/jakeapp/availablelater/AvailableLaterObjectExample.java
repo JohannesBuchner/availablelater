@@ -5,13 +5,13 @@ package com.jakeapp.availablelater;
  * 
  * @author Johannes Buchner
  */
-class AvailableLaterObjectExample {
+public class AvailableLaterObjectExample {
 
 	/**
 	 * First, we show the "normal" blocking behaviour. This does not spawn a new
 	 * Thread anywhere.
 	 */
-	static AvailableLaterObject<String> calcQuickly(final int param1) {
+	public static AvailableLaterObject<String> calcQuickly(final int param1) {
 		if (param1 == 0)
 			// we throw an error.
 			return new AvailableErrorObject<String>(new Exception("foo"));
@@ -24,7 +24,7 @@ class AvailableLaterObjectExample {
 		String v;
 		try {
 			// we just want the result, now! so use a AvailableLaterWaiter.
-			v = new AvailableLaterWaiter<String>(calcQuickly(param1)).get();
+			v = AvailableLaterWaiter.await(calcQuickly(param1));
 			System.out.println("Ah, the call finished. I got " + v);
 		} catch (Exception e) {
 			// we got a Exception:
@@ -43,7 +43,7 @@ class AvailableLaterObjectExample {
 	 * 
 	 * The calculation is the same as above.
 	 */
-	static AvailableLaterObject<String> calcSlowly(final int param1) {
+	public static AvailableLater<String> calcSlowly(final int param1) {
 		return new AvailableLaterObject<String>() {
 
 			@Override
@@ -68,9 +68,9 @@ class AvailableLaterObjectExample {
 		}.start();
 	}
 
-	static void callAsynchronous(int param1) {
+	public static void callAsynchronous(int param1) {
 		// make the call
-		AvailableLaterObject<String> result = calcSlowly(param1);
+		AvailableLater<String> result = calcSlowly(param1);
 
 		// here, the calculation is running, and we don't know the result yet.
 

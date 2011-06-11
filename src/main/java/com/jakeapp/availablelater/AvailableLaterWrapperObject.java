@@ -16,20 +16,30 @@ package com.jakeapp.availablelater;
 public abstract class AvailableLaterWrapperObject<T, S> extends
 	AvailableLaterObject<T> implements AvailabilityListener<S> {
 
-	private AvailableLaterObject<S> source;
+	private AvailableLater<S> source;
+
+	/**
+	 * @param source
+	 *            Result we are dependent on.
+	 */
+	public AvailableLaterWrapperObject(AvailableLater<S> source) {
+		this.source = source;
+		this.source.setListener(this);
+	}
 
 	/**
 	 * @param source
 	 *            Result we are dependent on.
 	 */
 	public AvailableLaterWrapperObject(AvailableLaterObject<S> source) {
-		this.source = source;
+		this.source = source.start();
+		this.source.setListener(this);
 	}
 
 	/**
 	 * Implementer function to fetch the result of the source calculation.
 	 */
-	protected AvailableLaterObject<S> getSource() {
+	protected AvailableLater<S> getSource() {
 		return this.source;
 	}
 
@@ -66,11 +76,11 @@ public abstract class AvailableLaterWrapperObject<T, S> extends
 
 	@Override
 	public void statusUpdate(StatusUpdate p) {
+		this.getListener().statusUpdate(p);
 	}
 
 	@Override
-	public AvailableLaterObject<T> start() {
-		this.getSource().start();
+	public AvailableLater<T> start() {
 		return this;
 	}
 }

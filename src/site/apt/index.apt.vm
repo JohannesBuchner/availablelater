@@ -16,6 +16,12 @@ immediatly.
 
   Making this the default behaviour simplifies writing threaded applications, such as GUIs.
 
+* Example
+
+  See the {{source code of AvailableLaterObjectExample{https://github.com/JohannesBuchner/availablelater/blob/master/src/test/java/com/jakeapp/availablelater/AvailableLaterObjectExample.java}}}
+
+* Discussion
+
   If you want to have the blocking behaviour, you simply create an AvailableLaterWaiter, which blocks until the result of the operation is available.
 
   Contrary to Futures, AvailableLaterObjects leave it to the callee to spawn and run the thread, or to decide if a result is instantaneously available (no thread spawn necessary, AvailableNowObject).
