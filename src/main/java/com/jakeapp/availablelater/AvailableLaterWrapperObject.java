@@ -1,50 +1,49 @@
 package com.jakeapp.availablelater;
 
-
 /**
- * An {@link AvailableLaterObject} that performs further calculations on the
- * results provided by another {@link AvailableLaterObject}. As with other
- * AvailableLaterObjects the calculation is performed in this class'
- * {@link #run()} method. The method can access the results of another
- * AvailableLaterObject: {@link #source} after finish has been called.
+ * The {@link AvailableLaterWrapperObject} allows simple linking of two
+ * {@link AvailableLaterObject}s. When the "source" availableLaterObject is
+ * finished, the calculate of this object is called. Use {@link #getSource()} to
+ * retrieve the original value.
  * 
  * @author christopher
  * 
- * @param <T> result type
- * @param <S> result type of source
+ * @param <T>
+ *            result type
+ * @param <S>
+ *            result type of source
  */
-public abstract class AvailableLaterWrapperObject<T, S> extends AvailableLaterObject<T> implements
-		AvailabilityListener<S> {
+public abstract class AvailableLaterWrapperObject<T, S> extends
+	AvailableLaterObject<T> implements AvailabilityListener<S> {
 
 	private AvailableLaterObject<S> source;
-	
+
+	/**
+	 * @param source
+	 *            Result we are dependent on.
+	 */
 	public AvailableLaterWrapperObject(AvailableLaterObject<S> source) {
-		this.setSource(source);
+		this.source = source;
 	}
 
 	/**
-	 * Sets the AvailableLaterObject that calculates the intermediate results
-	 * needed by this {@link AvailableLaterObject}'s run method.
-	 * 
-	 * @param source
-	 *            the source to set. Must been created with this Object as
-	 *            AvailabilityListener.
+	 * Implementer function to fetch the result of the source calculation.
 	 */
-	protected void setSource(AvailableLaterObject<S> source) {
-		this.source = source;
-		source.setListener(this);
-	}
-
 	protected AvailableLaterObject<S> getSource() {
 		return this.source;
 	}
 
+	/**
+	 * do not call this.
+	 */
 	@Override
 	public void error(Exception t) {
 		getListener().error(t);
 	}
 
-
+	/**
+	 * do not call this.
+	 */
 	@Override
 	public void finished(S o) {
 		/*
@@ -66,8 +65,7 @@ public abstract class AvailableLaterWrapperObject<T, S> extends AvailableLaterOb
 	}
 
 	@Override
-	public void statusUpdate(double progress, String status) {
-		getListener().statusUpdate(progress, status);
+	public void statusUpdate(StatusUpdate p) {
 	}
 
 	@Override

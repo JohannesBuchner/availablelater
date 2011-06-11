@@ -25,7 +25,7 @@ class TracingListener<V> implements AvailabilityListener<V> {
 	}
 
 	@Override
-	public void statusUpdate(double progress, String status) {
+	public void statusUpdate(StatusUpdate progress) {
 		// tracer.step("status update");
 		// always nice, but never required
 	}

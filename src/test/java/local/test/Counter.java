@@ -3,7 +3,6 @@ package local.test;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-
 public class Counter {
 
 	private int v = 0;

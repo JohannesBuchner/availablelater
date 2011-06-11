@@ -3,14 +3,17 @@ package com.jakeapp.availablelater;
 import org.apache.log4j.Logger;
 
 /**
- * A AvailableLater Object that is not really async but available
- * instantaneously
- *
+ * A {@link AvailableLaterObject} where the calculation is not asynchronous. To
+ * use when the result is available immediately, and it is not worth creating a
+ * Thread.
+ * 
  * @author johannes
  * @param <T>
+ *            result type.
  */
 public class AvailableNowObject<T> extends AvailableLaterObject<T> {
-	private static final Logger log = Logger.getLogger(AvailableNowObject.class);
+	private static final Logger log = Logger
+		.getLogger(AvailableNowObject.class);
 
 	/* server functions */
 	@Override
@@ -27,6 +30,11 @@ public class AvailableNowObject<T> extends AvailableLaterObject<T> {
 		return listener;
 	}
 
+	/**
+	 * 
+	 * @param content
+	 *            value to return.
+	 */
 	public AvailableNowObject(T content) {
 		log.debug("Creating AvailableNowObject with " + content);
 		this.set(content);

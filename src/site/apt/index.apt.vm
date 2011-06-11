@@ -5,6 +5,9 @@ About the AvailableLaterObject library
 
   ${project.description}
 
+  This library allows asynchronous method invocation, i.e. the result may not be available
+immediatly.
+
   In a normal blocking call, you can either 
     [[a]] wait for the result or <br/>
     [[b]] spawn a thread, do the call, and get notified when the thread finishes.

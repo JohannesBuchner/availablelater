@@ -9,7 +9,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
-
 public class Tracer {
 
 	private static Logger log = Logger.getLogger(Tracer.class);
@@ -32,6 +31,7 @@ public class Tracer {
 
 	/**
 	 * checks that no steps are left
+	 * 
 	 * @param time
 	 * @param unit
 	 * @return
@@ -51,6 +51,7 @@ public class Tracer {
 
 	/**
 	 * checks that no steps are left
+	 * 
 	 * @return
 	 */
 	public boolean isDone() {

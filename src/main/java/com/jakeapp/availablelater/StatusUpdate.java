@@ -9,6 +9,15 @@ public class StatusUpdate {
 		this.progress = progress;
 		this.status = status;
 	}
-	public double progress;
-	public String status;
+
+	private double progress;
+	private String status;
+
+	public double getProgress() {
+		return progress;
+	}
+
+	public String getStatus() {
+		return status;
+	}
 }

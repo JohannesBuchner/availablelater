@@ -1,17 +1,20 @@
 package com.jakeapp.availablelater;
 
 /**
- * An AvailableLaterObject that immediately reports an error.
- * Use this if a method that should return an AvailableLaterObject
- * fails with an exception before it can create an AvailableLaterObject.
+ * An {@link AvailableLaterObject} that immediately reports an error.
+ * 
+ * This avoids creating a Thread and boilerplate using the
+ * {@link AvailableLaterObject}, when the operation fails early.
+ * 
  * @author christopher
  */
 public class AvailableErrorObject<T> extends AvailableNowObject<T> {
 
 	private Exception exception;
-	
+
 	/**
-	 * @param ex The error to report.
+	 * @param ex
+	 *            The error to report.
 	 */
 	public AvailableErrorObject(Exception ex) {
 		super(null);

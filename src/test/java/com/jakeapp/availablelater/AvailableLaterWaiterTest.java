@@ -4,7 +4,6 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-
 public class AvailableLaterWaiterTest {
 
 	public static class AvailablesProvider {
@@ -25,18 +24,21 @@ public class AvailableLaterWaiterTest {
 		}
 
 		public static AvailableLaterObject<Boolean> provideError() {
-			return new AvailableErrorObject<Boolean>(new Exception("myerror")).start();
+			return new AvailableErrorObject<Boolean>(new Exception("myerror"))
+				.start();
 		}
 	}
 
 	@Test(timeout = 1000)
 	public void testAvailableNow() throws Exception {
-		Assert.assertTrue(AvailableLaterWaiter.await(AvailablesProvider.provideNow()));
+		Assert.assertTrue(AvailableLaterWaiter.await(AvailablesProvider
+			.provideNow()));
 	}
 
 	@Test(timeout = 1000)
 	public void testAvailableLater() throws Exception {
-		Assert.assertTrue(AvailableLaterWaiter.await(AvailablesProvider.provideLater()));
+		Assert.assertTrue(AvailableLaterWaiter.await(AvailablesProvider
+			.provideLater()));
 	}
 
 	@Test(timeout = 1000, expected = Exception.class)
