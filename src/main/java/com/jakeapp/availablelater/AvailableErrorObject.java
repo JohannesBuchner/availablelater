@@ -6,11 +6,11 @@ package com.jakeapp.availablelater;
  * This avoids creating a Thread and boilerplate using the
  * {@link AvailableLaterObject}, when the operation fails early.
  * 
- * @author christopher
+ * @author johannes
  */
 public class AvailableErrorObject<T> implements AvailableLater<T> {
 
-	private Exception exception;
+	private final Exception exception;
 
 	/**
 	 * @param ex

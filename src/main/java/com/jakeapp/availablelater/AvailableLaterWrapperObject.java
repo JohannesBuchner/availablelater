@@ -6,7 +6,7 @@ package com.jakeapp.availablelater;
  * finished, the calculate of this object is called. Use {@link #getSource()} to
  * retrieve the original value.
  * 
- * @author christopher
+ * @author johannes
  * 
  * @param <T>
  *            result type
@@ -14,25 +14,13 @@ package com.jakeapp.availablelater;
  *            result type of source
  */
 public abstract class AvailableLaterWrapperObject<T, S> extends
-	AvailableLaterObject<T> implements AvailabilityListener<S> {
+		AvailableLaterObject<T> implements AvailabilityListener<S> {
 
-	private AvailableLater<S> source;
+	private final AvailableLater<S> source;
+
 	private S sourceResult;
+
 	private Exception sourceException;
-
-	/**
-	 * fetch the result of the source calculation
-	 * 
-	 * @return
-	 * @throws Exception
-	 *             if the source throw an exception
-	 */
-	protected S getSourceResult() throws Exception {
-		if (this.sourceException != null)
-			throw this.sourceException;
-		return this.sourceResult;
-
-	}
 
 	/**
 	 * @param source
@@ -72,14 +60,29 @@ public abstract class AvailableLaterWrapperObject<T, S> extends
 		new Thread(this).start();
 	}
 
-	@Override
-	public void statusUpdate(StatusUpdate p) {
-		setStatus(p);
+	/**
+	 * fetch the result of the source calculation
+	 * 
+	 * @return
+	 * @throws Exception
+	 *             if the source throw an exception
+	 */
+	protected S getSourceResult() throws Exception {
+		if (this.sourceException != null) {
+			throw this.sourceException;
+		}
+		return this.sourceResult;
+
 	}
 
 	@Override
 	public AvailableLater<T> start() {
 		// we can't start, we have to wait for the source
 		return this;
+	}
+
+	@Override
+	public void statusUpdate(StatusUpdate p) {
+		setStatus(p);
 	}
 }

@@ -8,121 +8,12 @@ import local.test.Tracer;
 
 import org.junit.Test;
 
-import sun.java2d.pipe.NullPipe;
-
 public class AvailableLaterObjectTest {
 
 	public static class AvailablesProvider {
 
-		public static AvailableLater<Boolean> provideNow() {
-			return new AvailableNowObject<Boolean>(true);
-		}
-
-		public static AvailableLater<Boolean> provideLater() {
-			return new AvailableLaterObject<Boolean>() {
-
-				@Override
-				public Boolean calculate() throws Exception {
-					Thread.sleep(1);
-					return true;
-				}
-			}.start();
-		}
-		public static AvailableLater<Boolean> provideLaterDoubleStart() {
-			AvailableLaterObject<Boolean> avl = new AvailableLaterObject<Boolean>() {
-
-				@Override
-				public Boolean calculate() throws Exception {
-					Thread.sleep(1);
-					return true;
-				}
-			};
-			avl.start();
-			avl.start();
-			return avl;
-		}
-
-
 		public static AvailableLater<Boolean> provideError() {
 			return new AvailableErrorObject<Boolean>(new Exception("myerror"));
-		}
-
-		public static AvailableLater<Boolean> provideLaterError() {
-			return new AvailableLaterObject<Boolean>() {
-
-				@SuppressWarnings("null")
-				@Override
-				public Boolean calculate() throws Exception {
-					Thread.sleep(20);
-					String a = null;
-					a.toString();
-					return true;
-				}
-			}.start();
-		}
-
-		public static AvailableLater<String> provideLaterWrap() {
-			AvailableLater<String> parent =
-				new AvailableNowObject<String>("bar");
-			AvailableLaterObject<String> avl =
-				new AvailableLaterWrapperObject<String, String>(parent) {
-
-					@Override
-					public String calculate() throws Exception {
-						return "foo" + this.getSourceResult();
-					}
-				};
-			avl.start();
-			return avl;
-		}
-
-		public static AvailableLater<String> provideLaterWrapException() {
-
-			AvailableLater<String> parent =
-				new AvailableErrorObject<String>(new NullPointerException());
-			AvailableLaterObject<String> avl =
-				new AvailableLaterWrapperObject<String, String>(parent) {
-
-					@Override
-					public String calculate() throws Exception {
-						try {
-							this.getSourceResult();
-						} catch (NullPointerException e) {
-							return "nullish";
-						}
-						return "bar";
-					}
-				};
-			avl.start();
-			return avl;
-		}
-
-		public static AvailableLater<String> provideLaterChain() {
-			String[] words = { "ist", "das", "Haus", "vom", "Nikolaus" };
-			AvailableLaterObject<String> lastavl =
-				new AvailableLaterObject<String>() {
-
-					@Override
-					public String calculate() throws Exception {
-						return "Das";
-					}
-
-				};
-
-			AvailableLaterObject<String> avl1;
-			for (final String word : words) {
-				avl1 =
-					new AvailableLaterWrapperObject<String, String>(
-						lastavl.start()) {
-
-						@Override
-						public String calculate() throws Exception {
-							return this.getSourceResult() + " " + word;
-						}
-					};
-				lastavl = avl1;
-			}
-			return lastavl.start();
 		}
 
 		public static AvailableLater<BigInteger> provideFib(final int max) {
@@ -142,8 +33,8 @@ public class AvailableLaterObjectTest {
 							v[i] = v[i - 1].add(v[i - 2]);
 							i++;
 						}
-						this.setStatus(new StatusUpdate(j * 1.0 / nsteps,
-							"looks good: " + v[i - 1]));
+						setStatus(new StatusUpdate(j * 1.0 / nsteps,
+								"looks good: " + v[i - 1]));
 					}
 					while (i < max) {
 						Thread.sleep(1);
@@ -154,40 +45,115 @@ public class AvailableLaterObjectTest {
 				}
 			}.start();
 		}
+
+		public static AvailableLater<Boolean> provideLater() {
+			return new AvailableLaterObject<Boolean>() {
+
+				@Override
+				public Boolean calculate() throws Exception {
+					Thread.sleep(1);
+					return true;
+				}
+			}.start();
+		}
+
+
+		public static AvailableLater<String> provideLaterChain() {
+			String[] words = { "ist", "das", "Haus", "vom", "Nikolaus" };
+			AvailableLaterObject<String> lastavl = new AvailableLaterObject<String>() {
+
+				@Override
+				public String calculate() throws Exception {
+					return "Das";
+				}
+
+			};
+
+			AvailableLaterObject<String> avl1;
+			for (final String word : words) {
+				avl1 = new AvailableLaterWrapperObject<String, String>(
+						lastavl.start()) {
+
+					@Override
+					public String calculate() throws Exception {
+						return getSourceResult() + " " + word;
+					}
+				};
+				lastavl = avl1;
+			}
+			return lastavl.start();
+		}
+
+		public static AvailableLater<Boolean> provideLaterDoubleStart() {
+			AvailableLaterObject<Boolean> avl = new AvailableLaterObject<Boolean>() {
+
+				@Override
+				public Boolean calculate() throws Exception {
+					Thread.sleep(1);
+					return true;
+				}
+			};
+			avl.start();
+			avl.start();
+			return avl;
+		}
+
+		public static AvailableLater<Boolean> provideLaterError() {
+			return new AvailableLaterObject<Boolean>() {
+
+				@SuppressWarnings("null")
+				@Override
+				public Boolean calculate() throws Exception {
+					Thread.sleep(20);
+					String a = null;
+					a.toString();
+					return true;
+				}
+			}.start();
+		}
+
+		public static AvailableLater<String> provideLaterWrap() {
+			AvailableLater<String> parent = new AvailableNowObject<String>(
+					"bar");
+			AvailableLaterObject<String> avl = new AvailableLaterWrapperObject<String, String>(
+					parent) {
+
+				@Override
+				public String calculate() throws Exception {
+					return "foo" + getSourceResult();
+				}
+			};
+			avl.start();
+			return avl;
+		}
+
+		public static AvailableLater<String> provideLaterWrapException() {
+
+			AvailableLater<String> parent = new AvailableErrorObject<String>(
+					new NullPointerException());
+			AvailableLaterObject<String> avl = new AvailableLaterWrapperObject<String, String>(
+					parent) {
+
+				@Override
+				public String calculate() throws Exception {
+					try {
+						getSourceResult();
+					} catch (NullPointerException e) {
+						return "nullish";
+					}
+					return "bar";
+				}
+			};
+			avl.start();
+			return avl;
+		}
+
+		public static AvailableLater<Boolean> provideNow() {
+			return new AvailableNowObject<Boolean>(true);
+		}
 	}
 
-	@Test
-	public void testAvailableNow() {
-		final Tracer tracer = new Tracer();
-
-		AvailableLater<Boolean> avl = AvailablesProvider.provideNow();
-		avl.setListener(new TracingListener<Boolean>(tracer));
-		Assert.assertTrue(tracer
-			.await("done: true", 100, TimeUnit.MILLISECONDS));
-		Assert.assertTrue(tracer.isDone());
-	}
-
-	@Test
-	public void testAvailableLater() {
-		final Tracer tracer = new Tracer();
-
-		AvailableLater<Boolean> avl = AvailablesProvider.provideLater();
-		avl.setListener(new TracingListener<Boolean>(tracer));
-		Assert.assertTrue(tracer
-			.await("done: true", 100, TimeUnit.MILLISECONDS));
-		Assert.assertTrue(tracer.isDone());
-	}
-
-	@Test
-	public void testAvailableLaterDoubleStart() {
-		final Tracer tracer = new Tracer();
-
-		AvailableLater<Boolean> avl = AvailablesProvider.provideLater();
-		avl.setListener(new TracingListener<Boolean>(tracer));
-		Assert.assertTrue(tracer
-			.await("done: true", 100, TimeUnit.MILLISECONDS));
-		Assert.assertTrue(tracer.isDone());
-	}
+	private static final int FIB_MAX = 1000;
 
 	@Test
 	public void testAvailableError() {
@@ -196,22 +162,9 @@ public class AvailableLaterObjectTest {
 		AvailableLater<Boolean> avl = AvailablesProvider.provideError();
 		avl.setListener(new TracingListener<Boolean>(tracer));
 		Assert.assertTrue(tracer.await("error: myerror", 100,
-			TimeUnit.MILLISECONDS));
+				TimeUnit.MILLISECONDS));
 		Assert.assertTrue(tracer.isDone());
 	}
-
-	@Test
-	public void testAvailableLater_withError() {
-		final Tracer tracer = new Tracer();
-
-		AvailableLater<Boolean> avl = AvailablesProvider.provideLaterError();
-		avl.setListener(new TracingListener<Boolean>(tracer));
-		Assert.assertTrue(tracer.await("error: null", 100,
-			TimeUnit.MILLISECONDS));
-		Assert.assertTrue(tracer.isDone());
-	}
-
-	private static final int FIB_MAX = 1000;
 
 	@Test
 	public void testAvailableFib() {
@@ -233,36 +186,61 @@ public class AvailableLaterObjectTest {
 
 			@Override
 			public void statusUpdate(StatusUpdate u) {
-				if (u.getProgress() == 0.5)
+				if (u.getProgress() == 0.5) {
 					tracer.step("half done");
+				}
 				tracer.step(u.getProgress() + " - " + u.getStatus());
 			}
 
 		});
 		Assert.assertTrue(tracer
-			.await("half done", 2000, TimeUnit.MILLISECONDS));
+				.await("half done", 2000, TimeUnit.MILLISECONDS));
 		Assert.assertTrue(tracer.await("done", 2000, TimeUnit.MILLISECONDS));
 		// Assert.assertTrue(tracer.await("1556111435", 1000,
 		// TimeUnit.MILLISECONDS));
 	}
 
 	@Test
-	public void testWrap() {
+	public void testAvailableLater() {
 		final Tracer tracer = new Tracer();
-		AvailableLater<String> avl = AvailablesProvider.provideLaterWrap();
-		avl.setListener(new TracingListener<String>(tracer));
-		Assert.assertTrue(tracer.await("done: foobar", 100,
-			TimeUnit.MILLISECONDS));
+
+		AvailableLater<Boolean> avl = AvailablesProvider.provideLater();
+		avl.setListener(new TracingListener<Boolean>(tracer));
+		Assert.assertTrue(tracer
+				.await("done: true", 100, TimeUnit.MILLISECONDS));
 		Assert.assertTrue(tracer.isDone());
 	}
 
 	@Test
-	public void testWrapException() {
+	public void testAvailableLater_withError() {
 		final Tracer tracer = new Tracer();
-		AvailableLater<String> avl = AvailablesProvider.provideLaterWrapException();
-		avl.setListener(new TracingListener<String>(tracer));
-		Assert.assertTrue(tracer.await("done: nullish", 100,
-			TimeUnit.MILLISECONDS));
+
+		AvailableLater<Boolean> avl = AvailablesProvider.provideLaterError();
+		avl.setListener(new TracingListener<Boolean>(tracer));
+		Assert.assertTrue(tracer.await("error: null", 100,
+				TimeUnit.MILLISECONDS));
+		Assert.assertTrue(tracer.isDone());
+	}
+
+	@Test
+	public void testAvailableLaterDoubleStart() {
+		final Tracer tracer = new Tracer();
+
+		AvailableLater<Boolean> avl = AvailablesProvider.provideLater();
+		avl.setListener(new TracingListener<Boolean>(tracer));
+		Assert.assertTrue(tracer
+				.await("done: true", 100, TimeUnit.MILLISECONDS));
+		Assert.assertTrue(tracer.isDone());
+	}
+
+	@Test
+	public void testAvailableNow() {
+		final Tracer tracer = new Tracer();
+
+		AvailableLater<Boolean> avl = AvailablesProvider.provideNow();
+		avl.setListener(new TracingListener<Boolean>(tracer));
+		Assert.assertTrue(tracer
+				.await("done: true", 100, TimeUnit.MILLISECONDS));
 		Assert.assertTrue(tracer.isDone());
 	}
 
@@ -289,7 +267,28 @@ public class AvailableLaterObjectTest {
 
 		});
 		Assert.assertTrue(tracer.await("Das ist das Haus vom Nikolaus", 500,
-			TimeUnit.MILLISECONDS));
+				TimeUnit.MILLISECONDS));
+		Assert.assertTrue(tracer.isDone());
+	}
+
+	@Test
+	public void testWrap() {
+		final Tracer tracer = new Tracer();
+		AvailableLater<String> avl = AvailablesProvider.provideLaterWrap();
+		avl.setListener(new TracingListener<String>(tracer));
+		Assert.assertTrue(tracer.await("done: foobar", 100,
+				TimeUnit.MILLISECONDS));
+		Assert.assertTrue(tracer.isDone());
+	}
+
+	@Test
+	public void testWrapException() {
+		final Tracer tracer = new Tracer();
+		AvailableLater<String> avl = AvailablesProvider
+				.provideLaterWrapException();
+		avl.setListener(new TracingListener<String>(tracer));
+		Assert.assertTrue(tracer.await("done: nullish", 100,
+				TimeUnit.MILLISECONDS));
 		Assert.assertTrue(tracer.isDone());
 	}
 }

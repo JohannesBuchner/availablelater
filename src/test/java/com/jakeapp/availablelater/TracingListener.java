@@ -3,13 +3,11 @@
  */
 package com.jakeapp.availablelater;
 
-import org.apache.log4j.Logger;
-
 import local.test.Tracer;
 
 class TracingListener<V> implements AvailabilityListener<V> {
 
-	private Tracer tracer;
+	private final Tracer tracer;
 
 	public TracingListener(Tracer tracer) {
 		super();

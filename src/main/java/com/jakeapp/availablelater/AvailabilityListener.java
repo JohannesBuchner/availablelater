@@ -11,6 +11,20 @@ package com.jakeapp.availablelater;
 public interface AvailabilityListener<T> {
 
 	/**
+	 * The operation failed by throwing this exception.
+	 * 
+	 * @param o
+	 */
+	public void error(Exception t);
+
+	/**
+	 * The operation is finished, and this is the result.
+	 * 
+	 * @param o
+	 */
+	public void finished(T o);
+
+	/**
 	 * is called on progress updates
 	 * 
 	 * @param progress
@@ -22,19 +36,5 @@ public interface AvailabilityListener<T> {
 	 *            I18N table and display.
 	 */
 	public void statusUpdate(StatusUpdate progress);
-
-	/**
-	 * The operation is finished, and this is the result.
-	 * 
-	 * @param o
-	 */
-	public void finished(T o);
-
-	/**
-	 * The operation failed by throwing this exception.
-	 * 
-	 * @param o
-	 */
-	public void error(Exception t);
 
 }

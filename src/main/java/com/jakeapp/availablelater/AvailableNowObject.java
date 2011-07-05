@@ -12,7 +12,7 @@ package com.jakeapp.availablelater;
  */
 public class AvailableNowObject<T> implements AvailableLater<T> {
 
-	private T value;
+	private final T value;
 
 	public AvailableNowObject(T value) {
 		this.value = value;
